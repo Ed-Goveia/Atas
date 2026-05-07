@@ -9,7 +9,9 @@ export interface AtaDocument {
   title: string;
   createdAt: number;
   updatedAt: number;
-  status: 'Rascunho' | 'Exportada';
+  status: 'Rascunho' | 'Revisão' | 'Aprovada' | 'Exportada';
+  tags: string[];
+  notes: string;
   blocos: any;
   varsReuniao: any;
   history: AtaHistory[];

@@ -102,7 +102,12 @@ export const processAtaText = (
 
 
   const matchHora = rawEncerramento.match(/encerrou os trabalhos às (.*?)\./i);
-  if (matchHora) horaEncExt = matchHora[1].replace(/<\/?[^>]+(>|$)/g, "").trim();
+  if (matchHora) horaEncExt = matchHora[1].replace(/<\/?[^>]+(\>|$)/g, "").trim();
+
+  // Extract opening time from presencas ("Às Xh..." pattern)
+  let horaAberturaExt = 'XXX';
+  const matchHoraAbertura = rawPresencas.match(/(?:^|[\s\n])(?:[ÀA]s?)\s+([\dh]+(?:\d{2})?(?:\s*min(?:utos)?)?)/i);
+  if (matchHoraAbertura) horaAberturaExt = matchHoraAbertura[1].replace(/<\/?[^>]+(\>|$)/g, "").trim();
 
   // Caça os nomes no texto original para habilitar substituição dinâmica
   let nomePresExt = "";
@@ -199,6 +204,8 @@ export const processAtaText = (
   if (nomePresExt && nomePresExt !== "NOME") tplEncerramento = tplEncerramento.replace(regexPres, '{{nomePresidente}}');
   if (nomeSecExt && nomeSecExt !== "NOME") tplEncerramento = tplEncerramento.replace(regexSec, '{{nomeSecretario}}');
   if (horaEncExt && horaEncExt !== "XXX") tplEncerramento = tplEncerramento.replace(new RegExp(escapeRegExp(horaEncExt), 'gi'), '{{horario}}');
+  // Template opening time in presencas
+  if (horaAberturaExt && horaAberturaExt !== "XXX") tplPresencas = tplPresencas.replace(new RegExp(escapeRegExp(horaAberturaExt), 'gi'), '{{horarioAbertura}}');
 
   const formatBlock = (txt: string) => (txt || "").replace(/\n/g, '<br>');
 
@@ -242,7 +249,8 @@ export const processAtaText = (
 
   let finalVarsReuniao: any = { 
     tipo: tipoReuniao,
-    genero: generoDetectado, ataNum: numAtaExt, ataData: dataAtaExt, horario: horaEncExt,
+    genero: generoDetectado, ataNum: numAtaExt, ataData: dataAtaExt, 
+    horario: horaEncExt, horarioAbertura: horaAberturaExt,
     nomePresidente: nomePresExt, nomeSecretario: nomeSecExt
   };
 

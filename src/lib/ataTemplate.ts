@@ -108,6 +108,8 @@ export const compileTextToHtml = (tpl: string, vars: any) => {
   res = res.replace(/{{ataNum}}/g, `<span contenteditable="false" class="bg-blue-50 text-blue-700 px-1 rounded font-bold cursor-default select-none shadow-sm" data-var="ataNum">${displayAtaNum}</span>`);
   res = res.replace(/{{ataData}}/g, `<span contenteditable="false" class="bg-blue-50 text-blue-700 px-1 rounded font-bold cursor-default select-none shadow-sm" data-var="ataData">${displayAtaData}</span>`);
   res = res.replace(/{{horario}}/g, `<span contenteditable="false" class="bg-blue-50 text-blue-700 px-1 rounded font-bold cursor-default select-none shadow-sm" data-var="horario">${dispHorario}</span>`);
+  const dispHorarioAbertura = formatHorario(vars.horarioAbertura || vars.horario || 'XXX', config.horario || 'numero');
+  res = res.replace(/{{horarioAbertura}}/g, `<span contenteditable="false" class="bg-blue-50 text-blue-700 px-1 rounded font-bold cursor-default select-none shadow-sm" data-var="horarioAbertura">${dispHorarioAbertura}</span>`);
   
   res = res.replace(/{{gen_senhor}}/g, `${spanGen} data-var="gen_senhor">${vars.genero === 'f' ? 'a senhora' : 'o senhor'}</span>`);
   res = res.replace(/{{gen_o}}/g, `${spanGen} data-var="gen_o">${vars.genero === 'f' ? 'a' : 'o'}</span>`);
@@ -174,6 +176,8 @@ export const compileTextToPlain = (tpl: string, vars: any) => {
   res = res.replace(/{{ataNum}}/g, displayAtaNum);
   res = res.replace(/{{ataData}}/g, displayAtaData);
   res = res.replace(/{{horario}}/g, dispHorario);
+  const dispHorarioAberturaPlain = formatHorario(vars.horarioAbertura || vars.horario || 'XXX', config.horario || 'numero');
+  res = res.replace(/{{horarioAbertura}}/g, dispHorarioAberturaPlain);
   res = res.replace(/{{gen_senhor}}/g, vars.genero === 'f' ? 'a senhora' : 'o senhor');
   res = res.replace(/{{gen_o}}/g, vars.genero === 'f' ? 'a' : 'o');
   res = res.replace(/{{gen_a_pres_exerc}}/g, vars.generoPresidenteExercicio === 'f' ? 'a' : 'o');

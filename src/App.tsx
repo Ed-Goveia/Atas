@@ -3,7 +3,7 @@ import {
   Sparkles, RefreshCcw, Wand2, 
   CalendarDays, Clock, Layers, Users, 
   History, FileText, Archive, LogOut,
-  Save, History as HistoryIcon, Home, Settings, Undo2, Redo2
+  Save, History as HistoryIcon, Home, Settings, Undo2, Redo2, Scale, Mic
 } from 'lucide-react';
 import { CaixaEdicao } from './components/CaixaEdicao';
 import { LivePreview } from './components/LivePreview';
@@ -292,6 +292,8 @@ const App = () => {
           createdAt: Date.now(),
           updatedAt: Date.now(),
           status: 'Rascunho',
+          tags: [],
+          notes: '',
           blocos: finalBlocos,
           varsReuniao: finalVarsReuniao,
           history: [{ timestamp: Date.now(), blocos: finalBlocos, varsReuniao: finalVarsReuniao }],
@@ -330,6 +332,14 @@ const App = () => {
   const deleteAta = (id: string) => {
     setAtas(prev => {
       const updated = prev.filter(a => a.id !== id);
+      localStorage.setItem('atas_casp_v1', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const updateAtaMeta = (id: string, tags: string[], notes: string, status: string) => {
+    setAtas(prev => {
+      const updated = prev.map(a => a.id === id ? { ...a, tags, notes, status: status as any, updatedAt: Date.now() } : a);
       localStorage.setItem('atas_casp_v1', JSON.stringify(updated));
       return updated;
     });
@@ -385,7 +395,7 @@ const App = () => {
         </header>
 
         {currentView === 'dashboard' && (
-          <Dashboard atas={atas} onNewAta={() => navigateTo('new')} onOpenAta={loadAta} onDeleteAta={deleteAta} theme={theme} />
+          <Dashboard atas={atas} onNewAta={() => navigateTo('new')} onOpenAta={loadAta} onDeleteAta={deleteAta} onUpdateMeta={updateAtaMeta} theme={theme} />
         )}
 
         {currentView === 'new' && (
@@ -413,7 +423,18 @@ const App = () => {
         {currentView === 'editor' && (
           <div className="space-y-8 animate-in slide-in-from-bottom-8 duration-500 relative">
             <div className="flex justify-between items-center z-50 sticky top-4">
-               <div className="flex gap-2">
+               <div className="flex gap-2 items-center">
+                 {/* Doc type pill */}
+                 {currentAta && (
+                   <span className={`hidden sm:flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full border shadow-sm ${
+                     currentAta.varsReuniao?.tipo === 'audiencia'
+                       ? (theme === 'dark' ? 'bg-violet-900/40 border-violet-700 text-violet-300' : 'bg-violet-50 border-violet-200 text-violet-700')
+                       : (theme === 'dark' ? 'bg-blue-900/40 border-blue-700 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-700')
+                   }`}>
+                     {currentAta.varsReuniao?.tipo === 'audiencia' ? <Mic size={12} /> : <Scale size={12} />}
+                     {currentAta.varsReuniao?.tipo === 'audiencia' ? 'Audiência Pública' : 'Deliberativa'}
+                   </span>
+                 )}
                  <button onClick={() => setIsTimeMachineOpen(true)} className={`border px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all font-bold text-sm group ${theme === 'dark' ? 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:border-blue-500' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-blue-300'}`}>
                    <HistoryIcon size={16} className="text-blue-500 group-hover:-rotate-45 transition-transform" /> 
                    Time Machine
@@ -433,7 +454,16 @@ const App = () => {
 
             <div className="max-w-4xl mx-auto space-y-6">
                 <ErrorBoundary title="Presenças">
-                  <CaixaEdicao title="1. Presenças" icon={<Users size={16} className="text-slate-400" />} value={blocos.presencas} onChange={(val) => handleRichTextChange('presencas', val)} vars={varsReuniao} minHeight="120px" paperTheme={paperTheme} />
+                  <CaixaEdicao title="1. Presenças" icon={<Users size={16} className="text-slate-400" />} value={blocos.presencas} onChange={(val) => handleRichTextChange('presencas', val)} vars={varsReuniao} minHeight="120px" paperTheme={paperTheme}>
+                    <div className={`flex items-center gap-2 backdrop-blur p-1.5 rounded-xl shadow-sm border ${paperTheme === 'dark' ? 'bg-slate-800/80 border-slate-600' : 'bg-white/50 border-slate-200/50'}`}>
+                      <span className="text-[10px] font-bold text-blue-500 ml-2 hidden sm:block">ABERTURA:</span>
+                      <HoraVariacao
+                        label="Hora"
+                        value={inputVars.horarioAbertura || varsReuniao?.horarioAbertura}
+                        onChange={(v: string) => { setInputVars((prev: any) => ({ ...prev, horarioAbertura: v })); updateVar('horarioAbertura', v); }}
+                      />
+                    </div>
+                  </CaixaEdicao>
                 </ErrorBoundary>
 
                 <ErrorBoundary title="Abertura">
