@@ -16,6 +16,7 @@ import { Dashboard } from './components/Dashboard';
 import { TimeMachine } from './components/TimeMachine';
 import { AtaDocument, AtaHistory } from './types';
 import { DataVariacao, HoraVariacao, TextoVariacao } from './components/VariableControls';
+import { BRANDING } from './branding';
 
 const generateTitle = (vars: any) => {
   if (!vars) return 'Ata Sem Título';
@@ -343,8 +344,8 @@ const App = () => {
           <div className="flex items-center gap-4">
             <div className="bg-blue-700 p-3 rounded-xl text-white shadow-md cursor-pointer hover:bg-blue-800 transition-colors" onClick={() => navigateTo('dashboard')}><Wand2 size={28} /></div>
             <div>
-              <h1 className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Revisor de Atas <span className="text-blue-600 text-sm align-middle bg-blue-100 px-2 py-1 rounded-md ml-2">PRO</span></h1>
-              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Auto-Save, Time Machine e Edição Seletiva.</p>
+              <h1 className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{BRANDING.appName} <span className="text-blue-600 text-sm align-middle bg-blue-100 px-2 py-1 rounded-md ml-2">{BRANDING.badge}</span></h1>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{BRANDING.tagline}</p>
             </div>
           </div>
           

@@ -24,6 +24,11 @@ export const LivePreview = ({ blocos, varsReuniao, onExport, paperTheme = 'light
     return div.innerHTML; 
   };
 
+  const stripPunctuationSpaces = (html: string) => {
+    // Remove spaces that appear just before commas, periods, semicolons, colons, closing parens
+    return html.replace(/\s+([,\.;:!\?)])/g, '$1');
+  };
+
   const getLivePreviewHtml = () => {
     let finalHtml = "";
     const stripBreaks = (htmlStr: string) => {
@@ -31,18 +36,20 @@ export const LivePreview = ({ blocos, varsReuniao, onExport, paperTheme = 'light
       return safeHtml.replace(/<br\s*\/?>/gi, ' ').replace(/<\/?(p|div|li)[^>]*>/gi, ' ').replace(/\s+/g, ' ').trim();
     };
 
+    const compile = (bloco: string) => stripPunctuationSpaces(compileTextToPlain(bloco, varsReuniao));
+
     let ordem_do_dia_completa = "";
-    if (blocos.ordem_a) ordem_do_dia_completa += `${closeTags(compileTextToPlain(blocos.ordem_a, varsReuniao))} `;
-    if (blocos.ordem_b) ordem_do_dia_completa += `${closeTags(compileTextToPlain(blocos.ordem_b, varsReuniao))} `;
-    if (blocos.ordem_c) ordem_do_dia_completa += `${closeTags(compileTextToPlain(blocos.ordem_c, varsReuniao))}`;
-    ordem_do_dia_completa = ordem_do_dia_completa.trim();
+    if (blocos.ordem_a) ordem_do_dia_completa += `${closeTags(compile(blocos.ordem_a))} `;
+    if (blocos.ordem_b) ordem_do_dia_completa += `${closeTags(compile(blocos.ordem_b))} `;
+    if (blocos.ordem_c) ordem_do_dia_completa += `${closeTags(compile(blocos.ordem_c))}`;
+    ordem_do_dia_completa = stripPunctuationSpaces(ordem_do_dia_completa.trim());
 
     if (previewMode === 'single') {
-      finalHtml += `${stripBreaks(compileTextToPlain(blocos.presencas, varsReuniao))} ${stripBreaks(compileTextToPlain(blocos.abertura, varsReuniao))} ${stripBreaks(compileTextToPlain(blocos.expediente, varsReuniao))} ${stripBreaks(ordem_do_dia_completa)} ${stripBreaks(compileTextToPlain(blocos.encerramento, varsReuniao))}`;
+      finalHtml += `${stripBreaks(compile(blocos.presencas))} ${stripBreaks(compile(blocos.abertura))} ${stripBreaks(compile(blocos.expediente))} ${stripBreaks(ordem_do_dia_completa)} ${stripBreaks(compile(blocos.encerramento))}`;
     } else {
-      finalHtml += `${closeTags(compileTextToPlain(blocos.presencas, varsReuniao)).trim()}<br><br>${closeTags(compileTextToPlain(blocos.abertura, varsReuniao)).trim()}<br><br>${closeTags(compileTextToPlain(blocos.expediente, varsReuniao)).trim()}<br><br>${ordem_do_dia_completa}<br><br>${closeTags(compileTextToPlain(blocos.encerramento, varsReuniao)).trim()}`;
+      finalHtml += `${closeTags(compile(blocos.presencas)).trim()}<br><br>${closeTags(compile(blocos.abertura)).trim()}<br><br>${closeTags(compile(blocos.expediente)).trim()}<br><br>${ordem_do_dia_completa}<br><br>${closeTags(compile(blocos.encerramento)).trim()}`;
     }
-    return finalHtml;
+    return stripPunctuationSpaces(finalHtml);
   };
 
   const copyToClipboard = () => {
