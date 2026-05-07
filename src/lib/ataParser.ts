@@ -104,10 +104,13 @@ export const processAtaText = (
   const matchHora = rawEncerramento.match(/encerrou os trabalhos às (.*?)\./i);
   if (matchHora) horaEncExt = matchHora[1].replace(/<\/?[^>]+(\>|$)/g, "").trim();
 
-  // Extract opening time from presencas ("Às Xh..." pattern)
+
+  // Extract opening time from presencas - matches numeric patterns like 14h, 14h30, 14:00
   let horaAberturaExt = 'XXX';
-  const matchHoraAbertura = rawPresencas.match(/(?:^|[\s\n])(?:[ÀA]s?)\s+([\dh]+(?:\d{2})?(?:\s*min(?:utos)?)?)/i);
-  if (matchHoraAbertura) horaAberturaExt = matchHoraAbertura[1].replace(/<\/?[^>]+(\>|$)/g, "").trim();
+  const matchHoraAbertura = rawPresencas.match(/[\xC0\xE0Aa][s]?\s+(\d{1,2}[h:]?\d{0,2})/);
+  if (matchHoraAbertura) {
+    horaAberturaExt = matchHoraAbertura[1].replace(/<[^>]+>/g, '').trim();
+  }
 
   // Caça os nomes no texto original para habilitar substituição dinâmica
   let nomePresExt = "";

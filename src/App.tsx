@@ -79,7 +79,11 @@ const App = () => {
   const navigateTo = (view: 'dashboard' | 'new' | 'editor', ataId?: string | null) => {
     setCurrentView(view);
     if (ataId !== undefined) setCurrentAtaId(ataId);
-    
+    // Reset transient UI state when changing views
+    if (view === 'new' || view === 'dashboard') {
+      setIsProcessing(false);
+      setError(null);
+    }
     const params = new URLSearchParams();
     params.set('view', view);
     if (ataId) params.set('id', ataId);
@@ -88,6 +92,8 @@ const App = () => {
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
+      setIsProcessing(false);
+      setError(null);
       if (e.state && e.state.view) {
         setCurrentView(e.state.view);
         setCurrentAtaId(e.state.ataId || null);
@@ -409,7 +415,8 @@ const App = () => {
                   <button onClick={() => setInputMeetingType('audiencia')} className={`px-4 py-1.5 rounded-md font-bold transition-all ${inputMeetingType === 'audiencia' ? (theme === 'dark' ? 'bg-slate-700 text-blue-400 shadow-sm border border-slate-600' : 'bg-white text-blue-700 shadow-sm border border-slate-200') : 'text-slate-500 hover:text-slate-400'}`}>Audiência</button>
                 </div>
               </div>
-              <div ref={inputRef} contentEditable suppressContentEditableWarning className={`w-full min-h-[300px] mt-2 p-6 border rounded-xl focus:outline-none focus:ring-2 transition-all font-serif text-[15px] [&_b]:font-bold [&_strong]:font-bold [&_span[style*='bold']]:font-bold ${theme === 'dark' ? 'bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-slate-50 border-slate-300 focus:border-blue-500 focus:ring-blue-100'}`} data-placeholder="Dê Ctrl+V no texto copiado..." />
+              {/* The paste area follows paperTheme (Modo da Folha), not the global theme */}
+              <div ref={inputRef} contentEditable suppressContentEditableWarning className={`w-full min-h-[300px] mt-2 p-6 border rounded-xl focus:outline-none focus:ring-2 transition-all font-serif text-[15px] [&_b]:font-bold [&_strong]:font-bold [&_span[style*='bold']]:font-bold ${paperTheme === 'dark' ? 'bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-slate-50 border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-blue-100'}`} data-placeholder="Dê Ctrl+V no texto copiado..." />
               {error && <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-200">{error}</div>}
             </div>
             <div className={`p-6 flex justify-end border-t ${theme === 'dark' ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
