@@ -56,11 +56,11 @@ const App = () => {
   });
 
   const [varsReuniao, setVarsReuniao] = useState<any>({
-    genero: 'f', ataNum: '', ataData: '', horario: '', horarioAbertura: '', nomePresidente: '', nomeSecretario: ''
+    genero: 'f', ataNum: '', ataData: '', horario: '', nomePresidente: '', nomeSecretario: ''
   });
 
   const [inputVars, setInputVars] = useState<any>({
-    ataNum: '', horario: '', horarioAbertura: '', nomePresidente: '', nomeSecretario: ''
+    ataNum: '', horario: '', nomePresidente: '', nomeSecretario: ''
   });
 
   // Load configs from LocalStorage
@@ -285,7 +285,6 @@ const App = () => {
         setVarsReuniao(finalVarsReuniao);
         setInputVars({ 
           ataNum: finalVarsReuniao.ataNum, horario: finalVarsReuniao.horario,
-          horarioAbertura: finalVarsReuniao.horarioAbertura,
           nomePresidente: finalVarsReuniao.nomePresidente, nomeSecretario: finalVarsReuniao.nomeSecretario,
           nomePresidenteExercicio: finalVarsReuniao.nomePresidenteExercicio,
           temaDebate: finalVarsReuniao.temaDebate, numRequerimento: finalVarsReuniao.numRequerimento

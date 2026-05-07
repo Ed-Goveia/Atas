@@ -108,16 +108,11 @@ export const processAtaText = (
 
   // Extract opening time from presencas.
   // Handles both written-out ("quatorze horas") and numeric ("14h", "14:00") patterns.
-  // Strategy: capture the whole phrase and replace the inner part to handle HTML tags.
+  // Strategy: capture everything between "Às/As" and "do dia" (same as encerramento approach).
   let horaAberturaExt = 'XXX';
-  const matchHoraAbertura = rawPresencas.match(/([\xC0\xE0Aa][s]?\s+)(.+?)(\s+do\s+dia)/i);
+  const matchHoraAbertura = rawPresencas.match(/[\xC0\xE0Aa][s]?\s+(.+?)\s+do\s+dia/i);
   if (matchHoraAbertura) {
-    const fullMatch = matchHoraAbertura[0];
-    const middlePart = matchHoraAbertura[2];
-    horaAberturaExt = middlePart.replace(/<[^>]+>/g, '').trim();
-    // Replace the matched phrase with the templated version in tplPresencas
-    // We do this before other replacements to ensure we find the original text
-    tplPresencas = tplPresencas.replace(fullMatch, `${matchHoraAbertura[1]}{{horarioAbertura}}${matchHoraAbertura[3]}`);
+    horaAberturaExt = matchHoraAbertura[1].replace(/<[^>]+>/g, '').trim();
   }
 
   // Caça os nomes no texto original para habilitar substituição dinâmica
@@ -215,11 +210,8 @@ export const processAtaText = (
   if (nomePresExt && nomePresExt !== "NOME") tplEncerramento = tplEncerramento.replace(regexPres, '{{nomePresidente}}');
   if (nomeSecExt && nomeSecExt !== "NOME") tplEncerramento = tplEncerramento.replace(regexSec, '{{nomeSecretario}}');
   if (horaEncExt && horaEncExt !== "XXX") tplEncerramento = tplEncerramento.replace(new RegExp(escapeRegExp(horaEncExt), 'gi'), '{{horario}}');
-  // Template opening time in presencas (already handled above if matched by pattern)
-  // Fallback for cases where "do dia" pattern wasn't found but time string is known
-  if (horaAberturaExt && horaAberturaExt !== "XXX" && !tplPresencas.includes('{{horarioAbertura}}')) {
-    tplPresencas = tplPresencas.replace(new RegExp(escapeRegExp(horaAberturaExt), 'gi'), '{{horarioAbertura}}');
-  }
+  // Template opening time in presencas
+  if (horaAberturaExt && horaAberturaExt !== "XXX") tplPresencas = tplPresencas.replace(new RegExp(escapeRegExp(horaAberturaExt), 'gi'), '{{horarioAbertura}}');
 
   const formatBlock = (txt: string) => (txt || "").replace(/\n/g, '<br>');
 
